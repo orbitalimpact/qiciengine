@@ -1,0 +1,28 @@
+<!--Project管理-->
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="shortcut icon" href="../lib/imgs/qici.ico" />
+    <title>Projects</title>
+    <style>
+        /*去掉Notification导致的滚动条*/
+        body {
+            overflow: hidden;
+        }
+    </style>
+
+    <script>
+        QCDefault = {
+            toolTipDelay: 1000,
+            labelFont: '13px Arial'
+        };
+    </script>
+
+    <script type="text/javascript" src="lib/qc-widget.js"></script>
+    <script type="text/javascript" src="lib/qc-editor.js"></script>
+    <script type="text/javascript" src="lib/socket.io.js"></script>
+<body onload="G.initProject();">
+</body>
+</html>

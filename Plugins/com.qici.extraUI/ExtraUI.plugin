@@ -1,0 +1,12 @@
+{
+    "id": "com.qici.extraUI",
+    "name": "ExtraUI",
+    "version": "1.0",
+    "dependence": [
+    ],
+    "scriptDependence" : {
+        "ScrollSupport.js": ["Core.js"],
+        "TableViewAdapter.js": ["ScrollSupport.js"],
+        "TableView.js": ["TableViewAdapter.js"]
+    }
+}

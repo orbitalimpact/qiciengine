@@ -1,0 +1,1 @@
+node ./editorservice/StartService.js

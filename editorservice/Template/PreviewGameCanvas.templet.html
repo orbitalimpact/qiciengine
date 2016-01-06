@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+__VIEWPORT__
+    <link rel="shortcut icon" href="../../lib/imgs/qici.ico" />
+    <title>Preview Game Canvas</title>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="/Assets/css/style.css"/>
+
+    <script>
+        __CONFIG__
+        qici.config.renderer = 'Canvas';
+        qici.config.developerMode = true;
+        qici.config.preview = true;
+
+        __initResizableGameSize__
+
+        __PLUGIN_VARIABLES__
+
+        qici.scripts = [
+            __URLMAP_SCRIPTS__
+            '../lib/phaser.js',
+            '../lib/webfontloader.js',
+            '../lib/qc-core-debug.js',
+            // External scripts for plugins
+            __EXTERNAL_PLUGINS_SCRIPTS__
+            // Plugins scripts
+            __PLUGINS_SCRIPTS__
+            // User scripts
+            __USER_SCRIPTS__
+        ];
+
+		// Asset count that need preload in boot
+		qici.loadingAssetCount = __LOADING_ASSET_COUNT__;
+    </script>
+</head>
+
+<body onload="qici.init();">
+    <div id="dragDiv" style="position:absolute"></div>
+    <div id="gameDiv" style="position:absolute"></div>
+    <script src="../lib/qc-loading-debug.js"></script>
+    <script src='../../lib/qc-loading-editor.js'></script>
+</body>
+</html>

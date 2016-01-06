@@ -1,0 +1,9 @@
+{
+    "id": "com.qici.arcadePhysics",
+    "name": "Arcade Physics",
+    "version": "1.0",
+    "dependence": [],
+    "scriptDependence" : {
+        "Body.js": ["World.js"]
+    }
+}

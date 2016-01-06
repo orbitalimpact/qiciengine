@@ -1,0 +1,7 @@
+{
+    "id": "com.qici.serverCommunicate",
+    "name": "Server Communicate",
+    "version": "1.0",
+    "dependence": [
+    ]
+}
