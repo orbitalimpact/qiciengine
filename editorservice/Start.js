@@ -71,6 +71,7 @@ load('filesystem/AutoConfigProject');
 
 // 提供socket服务
 load('base/ModuleBase');
+load('base/ClientRepl');
 G.load('socket/Communicate');
 G.load('socket/Command');
 M.COMMAND.init();

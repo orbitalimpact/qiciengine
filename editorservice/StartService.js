@@ -25,7 +25,7 @@ var onServiceExit = function(errcode, signal) {
 // 带参数的启动服务
 var startNodeService = function(config) {
 	// 组合参数
-	var startArgv = [path.join(__dirname, 'Start.js')];
+	var startArgv = [path.join(__dirname, 'Start.js'), '--repl'];
 	if (config && config.length) {
 		Array.prototype.push.apply(startArgv, config);
 	}
@@ -33,7 +33,7 @@ var startNodeService = function(config) {
 	// 启动服务
 	var service = spawn(process.execPath, startArgv, {
 			detached : false,
-			stdio : ['pipe', process.stdout, process.stderr]
+			stdio : [process.stdin, process.stdout, process.stderr]
 		});
 
 	// 监听服务的结束

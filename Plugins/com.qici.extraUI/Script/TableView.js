@@ -67,7 +67,10 @@ Object.defineProperties(TableView.prototype, {
 
             this._adapterNode = v;
             // 删除当前的数据来源
-            this._adapter = null;
+            if (this._adapter) {
+                this._adapter.onDataChange.remove(this._clearTable, this);
+                this._adapter = null;
+            }
             this._needRebuild = true;
         }
     },
@@ -79,7 +82,10 @@ Object.defineProperties(TableView.prototype, {
     adapter : {
         get : function() { 
             if (!this._adapter) {
-                this._adapter = this.adapterNode.getScript('com.qici.extraUI.TableViewAdapter');
+                this._adapter = this.adapterNode && this.adapterNode.getScript('com.qici.extraUI.TableViewAdapter');
+                if (this._adapter) {
+                    this._adapter.onDataChange.add(this._clearTable, this);
+                }
             }
             return this._adapter;
         },

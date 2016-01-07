@@ -197,6 +197,8 @@ var initConfig = function() {
         transparent: false,
         developerMode: false,
         appCache: true,
+        dirtyRectangles: true,
+        dirtyRectanglesShow: false
     };
     var projectFile = settingPath + 'project.setting';
     if (!fs.existsSync(projectFile)) {
@@ -266,7 +268,9 @@ var initConfig = function() {
     // 创建css目录
     var cssPath = gameRoot + 'Assets/css/style.css';
     fs.ensureDirSync(gameRoot + 'Assets/css');
-    if (!fs.existsSync(cssPath)) fs.writeFileSync(cssPath, '/* css for dom */');
+    if (!fs.existsSync(cssPath)) fs.writeFileSync(cssPath, 
+        '/* css for dom */\n' + 
+        '* { box-sizing: border-box; -moz-box-sizing:border-box; -webkit-box-sizing:border-box; }\n');
 };
 initConfig();
 G.emitter.on('switchProject', function() {

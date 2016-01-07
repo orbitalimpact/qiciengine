@@ -38,6 +38,12 @@
 
             // 开发模式
             developerMode: true,
+
+            // 是否启用脏矩形
+            dirtyRectangles: __DIRTYRECTAGNLES__,
+
+            // 是否显示脏矩形区域
+            dirtyRectanglesShow: __DIRTYRECTAGNLESSHOW__,
         
             // 所有的游戏场景
             scene: {

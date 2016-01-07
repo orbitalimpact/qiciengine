@@ -71,9 +71,18 @@ clazz.prototype.listen = function(port) {
     // 客户端请求 post http://localhost:5002/remoteLog
     router.post('/', function(req, res) {
         var body = req.body;
-        console.log('remoteLog' , body);
-        res.send("200 OK");
-        res.end();
+        var ret = body.match(/:queryCmd:(.*)/)
+        if (ret && ret.index === 0)
+        {
+            // 客户端请求获取脚本指令
+            queryCmdFromClient(res, ret[1]);
+        }
+        else
+        {
+            console.log('remoteLog' , body);
+            res.send("200 OK");
+            res.end();
+        }
     });
 
     // 监听端口重复事件以进行重试

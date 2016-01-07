@@ -242,7 +242,7 @@ ServerCommunicate.prototype.socketConnect = function(opts) {
 ServerCommunicate.prototype.sendSocketMessage = function(cmd) {
 
     if (!this.socket || !this.isConnected)
-        return;
+        return false;
 
     // 发送消息
     this.socket.emit.apply(this.socket, arguments);

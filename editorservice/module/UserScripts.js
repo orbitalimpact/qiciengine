@@ -113,7 +113,7 @@ clazz.prototype.getUserScripts = function() {
  */
 clazz.prototype.getEditorExtends = function() {
     // 获取用户的编辑器扩展脚本，强制在Game/Editor目录下
-    return this.getScripts('Editor', 'Editor/Service');
+    return this.getScripts('Editor', ['Editor/Service']);
 };
 
 /**
@@ -250,8 +250,11 @@ clazz.prototype.genTemplateContent = function(content, publish) {
     content = content.replace(/__RENDERER__/g, G.config.project.renderer);
     content = content.replace(/__ENTRY_SCENE__/g, G.config.scene.entryScene);
     content = content.replace(/__LOADINGPREFAB__/g, G.config.project.loading || '');
-    content = content.replace(/{__ver__}/g, G.VERSION);
 
+    content = content.replace(/__DIRTYRECTAGNLES__/g, G.config.project.dirtyRectangles);
+    content = content.replace(/__DIRTYRECTAGNLESSHOW__/g, G.config.project.dirtyRectanglesShow);
+    content = content.replace(/{__ver__}/g, G.VERSION);
+    
     var meta = "    <meta name='viewport' content='width=device-width,user-scalable=no'>\n" +
                 "    <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'>\n" +
                 "    <meta name='apple-mobile-web-app-capable' content='yes'>\n" +

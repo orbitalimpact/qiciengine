@@ -100,32 +100,42 @@ Object.defineProperties(NodeFadeInOut.prototype, {
  * 生效
  */
 NodeFadeInOut.prototype.onEnable = function() {
-    if (this._cachedTarget._destroy) {
+    var self = this;
+    if (self._cachedTarget._destroy) {
         return;
     }
-    this._cachedTarget.visible = true;
-    if (this._cachedTexture) {
-        this._cachedTexture.destroy(true);
-        this._cachedTexture = null;
+    self._cachedTarget.visible = true;
+    if (self._cachedTexture) {
+        self._cachedTexture.destroy(true);
+        self._cachedTexture = null;
     }
     // 获取缓存信息
-    this._cachedBounds = this._cachedTarget.localBounds;
-    this._cachedTexture = this._cachedTarget.generateTexture();
-    this._cachedSprite = new PIXI.Sprite(this._cachedTexture);
-    this._cachedSprite.worldTransform = this._cachedTarget.worldTransform;
-    this._cachedTarget.phaser.anchor && (this._cachedSprite.anchor = this._cachedTarget.phaser.anchor);
+    self._cachedBounds = self._cachedTarget.localBounds;
+    self._cachedTexture = self._cachedTarget.generateTexture();
+    self._cachedSprite = new PIXI.Sprite(self._cachedTexture);
+    self._cachedSprite.worldTransform = self._cachedTarget.worldTransform;
+    self._cachedTarget.phaser.anchor && (self._cachedSprite.anchor = self._cachedTarget.phaser.anchor);
 
     // 替换绘制函数
-    if (!this._nodeRenderCanvas) {
-        this._nodeRenderCanvas = this.gameObject.phaser._renderCanvas;
-        this.gameObject.phaser._renderCanvas = this.renderCanvas.bind(this);
+    if (!self._nodeRenderCanvas) {
+        self._nodeRenderCanvas = self.gameObject.phaser._renderCanvas;
+        self.gameObject.phaser._renderCanvas = self.renderCanvas.bind(this);
+
+        self.gameObject.phaser.getSelfWidth = function() {
+            return self._cachedSprite.width;
+        };
+        self.gameObject.phaser.getSelfHeight = function() {
+            return self._cachedSprite.height;
+        };
+        self.gameObject.phaser._skipChildrenRender = true;
     }
 
-    if (!this._nodeRenderWebGL) {
-        this._nodeRenderWebGL = this.gameObject.phaser._renderWebGL;
-        this.gameObject.phaser._renderWebGL = this.renderWebGL.bind(this);
+    if (!self._nodeRenderWebGL) {
+        self._nodeRenderWebGL = self.gameObject.phaser._renderWebGL;
+        self.gameObject.phaser._renderWebGL = self.renderWebGL.bind(this);
     }
 
+    
     // 缓存对象不是自身时，直接隐藏
     //if (this._cachedTarget !== this.gameObject) {
     //    this._cachedTarget.visible = false;
@@ -143,6 +153,9 @@ NodeFadeInOut.prototype.onDisable = function() {
     if (this._nodeRenderWebGL) {
         this.gameObject.phaser._renderWebGL = this._nodeRenderWebGL;
         this._nodeRenderWebGL = null;
+        this.gameObject.phaser.getSelfWidth = null;
+        this.gameObject.phaser.getSelfHeight = null;
+        this.gameObject.phaser._skipChildrenRender = false;
     }
     if (this._cachedTexture) {
         this._cachedTexture.destroy(true);
@@ -180,6 +193,7 @@ NodeFadeInOut.prototype.onDestroy = function() {
 // 帧调度: 驱动位置
 NodeFadeInOut.prototype.onUpdate = function(factor, isFinished) {
     this._factorValue = this.fadeType === NodeFadeInOut.FADE_IN ? (1 - factor) : factor;
+    this.gameObject.phaser.displayChanged(qc.DisplayChangeStatus.TEXTURE | qc.DisplayChangeStatus.SIZE);
     if (isFinished && !this._cachedTarget._destroy && this._cachedTarget === this.gameObject) {
         this._cachedTarget.visible = this.fadeType === NodeFadeInOut.FADE_IN;
     }
