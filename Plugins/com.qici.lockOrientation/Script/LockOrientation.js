@@ -24,9 +24,12 @@ var LockOrientation = qc.defineBehaviour('qc.Plugins.LockOrientation', qc.Behavi
 
     // 本组件可以在编辑器模式下运行
     self.runInEditor = true;
+
+    self.manualType = 0;
 }, {
     orientation: qc.Serializer.INT,
-    desktop: qc.Serializer.BOOLEAN
+    desktop: qc.Serializer.BOOLEAN,
+    manualType: qc.Serializer.INT
 });
 LockOrientation.__menu = 'Plugins/LockOrientation';
 
@@ -46,12 +49,28 @@ Object.defineProperties(LockOrientation.prototype, {
 // 初始化处理，关注横竖版事件并做处理
 LockOrientation.prototype.awake = function() {
     var self = this, o = self.gameObject;
+
     self.game.world.onSizeChange.add(self._doOrientation, self);
     o.parent.onRelayout.add(self.assureSize, self);
 
     // 确保目标节点大小、pivot与世界一致
     self._doOrientation();
     self.assureSize();
+
+    var adapter = o.parent.getScript('qc.ScaleAdapter');
+
+    if (adapter) {
+        self.manualType = adapter.manualType;
+        // 本插件需要重载掉ScaleAdapter，在屏幕宽高缩放时，需要按照旋转后的长宽来获取
+        var oldScaleAdapter_getReferenceResolution = adapter.getReferenceResolution;
+        adapter.getReferenceResolution = function() {
+            var p = oldScaleAdapter_getReferenceResolution.call(this);
+            if (self.rotate90) {
+                return new qc.Point(p.y, p.x);
+            }
+            return p;        
+        };
+    }
 };
 
 // 组件析构的处理
@@ -65,7 +84,7 @@ LockOrientation.prototype.assureSize = function() {
     var self = this, o = self.gameObject;
 
     var rect = o.parent.rect;
-    if (self.game.device.rotate90 === true) {
+    if (self.rotate90 === true) {
         // 旋转时，对调下长宽，确保和父亲节点重合
         o.width = rect.height;
         o.height = rect.width;
@@ -87,7 +106,7 @@ LockOrientation.prototype._doOrientation = function() {
 
     if (!self.desktop && !self.game.editor && self.game.device.desktop) {
         o.rotation = 0;
-        self.game.device.rotate90 = false;
+        self.rotate90 = false;
         return;
     }
 
@@ -95,7 +114,7 @@ LockOrientation.prototype._doOrientation = function() {
     case qc.Device.AUTO:
     default:
         o.rotation = 0;
-        self.game.device.rotate90 = false;
+        self.rotate90 = false;
         return;
 
     case qc.Device.PORTRAIT:
@@ -103,24 +122,30 @@ LockOrientation.prototype._doOrientation = function() {
         if (v === self.orientation) {
             // 一致，就不需要旋转了
             o.rotation = 0;
-            self.game.device.rotate90 = false;
+            self.rotate90 = false;
         }
         else {
             // 不一致，旋转90度
             o.rotation = -Math.PI / 2;
-            self.game.device.rotate90 = true;
+            self.rotate90 = true;
         }
         self.assureSize();
         break;
     }
+    var adapter = o.parent.getScript('qc.ScaleAdapter');
+    if (adapter && self.rotate90) {
+        if (self.manualType === qc.ScaleAdapter.MANUAL_WIDTH) {
+            adapter.manualType = qc.ScaleAdapter.MANUAL_HEIGHT;
+        }
+        else if (self.manualType === qc.ScaleAdapter.MANUAL_HEIGHT) {
+            adapter.manualType = qc.ScaleAdapter.MANUAL_WIDTH;
+        }
+        else {
+            adapter.manualType = self.manualType;
+        }
+    }
+    else {
+        adapter.manualType = self.manualType;
+    }
 };
 
-// 本插件需要重载掉ScaleAdapter，在屏幕宽高缩放时，需要按照旋转后的长宽来获取
-var oldScaleAdapter_getReferenceResolution = qc.ScaleAdapter.prototype.getReferenceResolution;
-qc.ScaleAdapter.prototype.getReferenceResolution = function() {
-    var p = oldScaleAdapter_getReferenceResolution.call(this);
-    if (this.game.device.rotate90) {
-        return new qc.Point(p.y, p.x);
-    }
-    return p;
-};
