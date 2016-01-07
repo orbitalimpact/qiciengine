@@ -10,6 +10,8 @@ __VIEWPORT__
         html, body {
             padding: 0;
             margin: 0;
+            width: 100%;
+            height: 100%;               
         }
     </style>
     <link rel="stylesheet" type="text/css" href="./Assets/css/style.css"/>
@@ -23,6 +25,7 @@ __VIEWPORT__
             companyName: '__COMPANY_NAME__',
             bundleIdentifier: '__BUNDLE_IDENTIFIER__',
             gameInstance: '__GAME_INSTANCE__',
+            frameRate: __FRAMERATE__,
             backgroundColor: __BACKGROUNDCOLOR__,
             runInBackground: __RUNINBACKGROUND__,
             antialias: __ANTIALIAS__,
@@ -63,7 +66,9 @@ __EXTERNAL_PLUGINS_SCRIPTS__
 </head>
 
 <body onload="qici.init();">
-    <div id="gameDiv" style="position:relative;"></div>
+    <div style="overflow:hidden;padding:0;margin:0;width:100%;height:100%;">
+        <div id="gameDiv" style="position:relative;"></div>
+    </div>
     <script src='http://engine.zuoyouxi.com/lib/{__ver__}/qc-loading.js'></script>
 </body>
 

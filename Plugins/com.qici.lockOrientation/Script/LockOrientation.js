@@ -60,7 +60,6 @@ LockOrientation.prototype.awake = function() {
     var adapter = o.parent.getScript('qc.ScaleAdapter');
 
     if (adapter) {
-        self.manualType = adapter.manualType;
         // 本插件需要重载掉ScaleAdapter，在屏幕宽高缩放时，需要按照旋转后的长宽来获取
         var oldScaleAdapter_getReferenceResolution = adapter.getReferenceResolution;
         adapter.getReferenceResolution = function() {
@@ -133,19 +132,21 @@ LockOrientation.prototype._doOrientation = function() {
         break;
     }
     var adapter = o.parent.getScript('qc.ScaleAdapter');
-    if (adapter && self.rotate90) {
-        if (self.manualType === qc.ScaleAdapter.MANUAL_WIDTH) {
-            adapter.manualType = qc.ScaleAdapter.MANUAL_HEIGHT;
-        }
-        else if (self.manualType === qc.ScaleAdapter.MANUAL_HEIGHT) {
-            adapter.manualType = qc.ScaleAdapter.MANUAL_WIDTH;
+    if (adapter) {
+        if (self.rotate90) {
+            if (self.manualType === qc.ScaleAdapter.MANUAL_WIDTH) {
+                adapter.manualType = qc.ScaleAdapter.MANUAL_HEIGHT;
+            }
+            else if (self.manualType === qc.ScaleAdapter.MANUAL_HEIGHT) {
+                adapter.manualType = qc.ScaleAdapter.MANUAL_WIDTH;
+            }
+            else {
+                adapter.manualType = self.manualType;
+            }
         }
         else {
             adapter.manualType = self.manualType;
         }
-    }
-    else {
-        adapter.manualType = self.manualType;
     }
 };
 

@@ -287,6 +287,7 @@ clazz.prototype.genTemplateContent = function(content, publish) {
     content = content.replace(/__COMPANY_NAME__/g, G.config.project.companyName);
     content = content.replace(/__BUNDLE_IDENTIFIER__/g, G.config.project.bundleIdentifier);
     content = content.replace(/__GAME_INSTANCE__/g, G.config.project.gameInstance);
+    content = content.replace(/__FRAMERATE__/g, JSON.stringify(G.config.project.frameRate));
     content = content.replace(/__BACKGROUNDCOLOR__/g, G.config.project.backgroundColor);
     content = content.replace(/__RUNINBACKGROUND__/g, G.config.project.runInBackground);
     content = content.replace(/__ANTIALIAS__/g, G.config.project.antialias);

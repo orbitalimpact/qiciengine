@@ -10,6 +10,8 @@ __VIEWPORT__
         html, body {
             padding: 0;
             margin: 0;
+            width: 100%;
+            height: 100%;              
         }
     </style>
     <link rel="stylesheet" type="text/css" href="/Assets/css/style.css"/>
@@ -39,8 +41,9 @@ __VIEWPORT__
 </head>
 
 <body onload="qici.init();">
-<div id="gameDiv" style="position:absolute;width:100%;height:100%"></div>
-
+    <div style="overflow:hidden;padding:0;margin:0;width:100%;height:100%;">
+        <div id="gameDiv" style="position:absolute;width:100%;height:100%"></div>
+    </div>
 <script src='../../lib/qc-loading-debug.js'></script>
 <script src='../../lib/qc-loading-editor.js'></script>
 </body>

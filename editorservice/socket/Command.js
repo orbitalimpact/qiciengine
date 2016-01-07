@@ -26,7 +26,7 @@ clazz.prototype.init = function() {
     var self = this;
     var config;
     try {
-        config = fs.readJsonSync(path.join(G.editorRoot, 'project.setting'), { throws : false }) || {};   
+        config = fs.readJsonSync(path.join(G.editorRoot, 'project.setting'), { throws : false }) || {};
     }
     catch (e) {
         config = {};
@@ -47,8 +47,12 @@ clazz.prototype.init = function() {
         for (var cmd in self._cmds) {
             self._registerCmdToIO(cmd, socket);
         }
+
+        // 通知有连接接入
+        G.emitter.emit('newConnection', socket);
+        G.beConnnected = true;
     });
-}
+};
 
 /**
  * 注册一个消息处理器
@@ -63,7 +67,7 @@ clazz.prototype.registerCmd = function(cmd) {
         G.log.error('消息处理器{0}已经存在了！', cmd.name);
 
     this._cmds[cmd.name] = cmd;
-}
+};
 
 /**
  * 反馈消息给客户端

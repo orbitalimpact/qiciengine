@@ -206,6 +206,8 @@ clazz.prototype.publishTo = function(dstDir) {
 
     // 遍历 Game/Assets 文件夹
     var explorePath = function(dir, targetDir) {
+        if (!fs.existsSync(dir))
+            return;
         var list = fs.readdirSync(dir);
         for (var i = 0, len = list.length; i < len; i++) {
             var subPath = list[i];

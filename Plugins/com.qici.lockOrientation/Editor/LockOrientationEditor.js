@@ -19,6 +19,19 @@ G.extend.inspector('qc.Plugins.LockOrientation', function() {
             { label: 'Landscape', value: qc.Device.LANDSCAPE }
         ]})
     ]);
+        // 缩放类型
+    gui.line([
+        gui.text('Manual Type'),
+        gui.dropDownList({ bind: 'manualType', 'items': [
+            { label: 'None', value: qc.ScaleAdapter.NONE },
+            { label: 'Height', value: qc.ScaleAdapter.MANUAL_HEIGHT },
+            { label: 'Width', value: qc.ScaleAdapter.MANUAL_WIDTH },
+            { label: 'Expand', value: qc.ScaleAdapter.EXPAND },
+            { label: 'Shrink', value: qc.ScaleAdapter.SHRINK },
+            { label: 'Fill', value: qc.ScaleAdapter.FILL }
+        ]})
+    ]);
+    
     gui.line([
        gui.text('Desktop'),
         gui.checkBox({bind: 'desktop'})

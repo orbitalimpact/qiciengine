@@ -26,6 +26,7 @@ var genHTML = function() {
 
     // 重新生成游戏启动文件
     G.log.debug('switch project and generate game html.');
+    M.USER_SCRIPTS.restore();
     M.PROJECT.genGameHTML();
 };
 

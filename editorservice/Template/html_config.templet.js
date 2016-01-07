@@ -14,6 +14,9 @@
         
             // 游戏示例，将作为全局变量访问，默认为：game
             gameInstance: '__GAME_INSTANCE__',
+
+            // 帧率
+            frameRate: __FRAMERATE__,
             
             // 游戏背景色
             backgroundColor: __BACKGROUNDCOLOR__,

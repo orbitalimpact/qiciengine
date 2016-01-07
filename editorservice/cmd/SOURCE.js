@@ -12,7 +12,11 @@ M.COMMAND.registerCmd({
     main : function(socket, cookie, file) {
         var fullPath = fsEx.expandPath(G.gameRoot + file);
 
-        var content = fs.readFileSync(fullPath);
+        var content;
+        try {
+            content = fs.readFileSync(fullPath);
+        }
+        catch (e) {};
         if (!content) return '';
 
         // 数据二进制化，如果是图片信息，用 base64 加工发送

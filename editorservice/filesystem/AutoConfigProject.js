@@ -36,6 +36,7 @@ var genEditorHtmlTemplate = function() {
 G.emitter.on('serviceOn', function() {
     createProjectFile();
     if (G.gameRoot) {
+        M.USER_SCRIPTS.restore();
         genEditorHtmlTemplate();
         createCodeEditorFile();
     }
@@ -49,6 +50,14 @@ G.emitter.on('serviceOn', function() {
     else {
         var opener = require('opener');
         opener('http://localhost:' + M.COMMUNICATE.port + '/Project.html');
+
+        // 等待 3 秒连接进入
+        setTimeout(function() {
+            if (G.beConnnected) return;
+            var chalk = require('chalk');
+            G.log.trace(chalk.red('Please enter this url in browser:\n=====\nhttp://127.0.0.1:{0}/Project.html\n====='),
+                M.COMMUNICATE.port);
+        }, 3 * 1000);
     }
 });
 
@@ -176,6 +185,10 @@ var initConfig = function() {
         companyName: "DefaultCompany",
         bundleIdentifier: "com.DefaultCompany.Default",
         gameInstance: "qc_game",
+        frameRate: {
+            'mobile': 30,
+            'desktop': 60
+        },
         backgroundColor: 0xff474747,
         runInBackground: true,
         antialias: true,
@@ -188,6 +201,9 @@ var initConfig = function() {
         writeProjectSetting(defaultProjectSetting);
     }
     G.config.project = fs.readJsonFileSync(projectFile);
+    if (G.config.project.frameRate == null) {
+        G.config.project.frameRate = defaultProjectSetting.frameRate;
+    }
     if (G.config.project.backgroundColor == null) {
         G.config.project.backgroundColor = defaultProjectSetting.backgroundColor;
     }
