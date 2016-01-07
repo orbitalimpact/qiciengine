@@ -43,7 +43,7 @@ clazz.prototype.listen = function(port) {
     });
 
     // 增加 express 中间件 CORS，以允许跨域访问
-    var cors = require('cors')
+    var cors = require('cors');
     app.use(cors());
 
     // http 方式提供直接的访问文件的方式
@@ -71,7 +71,7 @@ clazz.prototype.listen = function(port) {
     // 客户端请求 post http://localhost:5002/remoteLog
     router.post('/', function(req, res) {
         var body = req.body;
-        console.log('remoteLog' , body)
+        console.log('remoteLog' , body);
         res.send("200 OK");
         res.end();
     });
@@ -88,6 +88,9 @@ clazz.prototype.listen = function(port) {
         }
     });
 
+    // 获取本地ip地址
+    M.COMMUNICATE.host = M.util.getLocalIP();
+
     // 监听端口，启动服务
     http.listen(port, function() {
         G.log.important('Port = {0}', port);
@@ -96,7 +99,7 @@ clazz.prototype.listen = function(port) {
         // 派发成功监听的回调
         G.emitter.emit('serviceOn', {
             port : port
-        })
+        });
     });
 
     return io;

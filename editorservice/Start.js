@@ -102,7 +102,7 @@ if (process.argv.indexOf('--repl') > 0) {
             output: process.stdout
         });
     });
-};
+}
 
 // 打包后的资源
 G.load('filesystem/GameFiles');
@@ -119,8 +119,15 @@ G.load('module/Setting.js');
 // 场景管理模块
 G.load('module/SceneManager.js');
 
+// 载入前端与后端通讯管理
+G.load('module/ServicePipe.js');
+
+// 拓展模块管理
+G.load('module/ExternalModules.js');
+
 // 载入工具处理模块
 G.loadDir('patch');
 
 // 通知所有模块载入成功
 G.emitter.emit('postInit');
+

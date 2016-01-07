@@ -21,6 +21,7 @@ clazz.prototype.constructor = clazz;
 clazz.prototype.getScriptOrder = function(dir) {
     if (dir === 'Scripts') return G.gameFiles.logicalScriptOrder || [];
     if (dir === 'Editor') return G.gameFiles.editorScriptOrder || [];
+    if (dir === 'Editor/Service') return G.gameFiles.editorServiceScriptOrder || [];
     return [];
 };
 
@@ -48,6 +49,10 @@ clazz.prototype.setScriptOrder = function(dir, order) {
         G.log.debug('save editor script setting, generate html.');
         G.emitter.emit('refreshStartupFile');
     }
+    else if (dir === 'Editor/Service') {
+        G.gameFiles.editorServiceScriptOrder = order;
+        this.save();
+    }
     else
         return;
 };
@@ -55,7 +60,7 @@ clazz.prototype.setScriptOrder = function(dir, order) {
 /**
  * 获取某个目录下的脚本，需要按照依赖关系排序
  */
-clazz.prototype.getScripts = function(dir) {
+clazz.prototype.getScripts = function(dir, except) {
     // 收集所有的脚本文件
     var uuid2file = G.gameFiles.uuid2file;
 
@@ -66,7 +71,18 @@ clazz.prototype.getScripts = function(dir) {
 
     for (var uuid in uuid2file) {
         var path = uuid2file[uuid];
-        if (path.indexOf(dir) == 0) {
+        if (path.indexOf(dir) === 0) {
+            if (except) {
+                // 是否属于排除的对象
+                var len = except.length;
+                var isException = false;
+                while (len-- && !isException) {
+                    isException = path.indexOf(except[len]) === 0;
+                }
+                if (isException) {
+                    continue;
+                }
+            }
             for (weight = 0; weight < orderLen; weight++)
                 if (path.indexOf(order[weight]) === 0)
                     break;
@@ -97,7 +113,14 @@ clazz.prototype.getUserScripts = function() {
  */
 clazz.prototype.getEditorExtends = function() {
     // 获取用户的编辑器扩展脚本，强制在Game/Editor目录下
-    return this.getScripts('Editor');
+    return this.getScripts('Editor', 'Editor/Service');
+};
+
+/**
+ * 获取后台扩展的脚本列表
+ */
+clazz.prototype.getServiceExtends = function() {
+    return this.getScripts('Editor/Service');
 };
 
 /**
@@ -232,9 +255,16 @@ clazz.prototype.genTemplateContent = function(content, publish) {
     var meta = "    <meta name='viewport' content='width=device-width,user-scalable=no'>\n" +
                 "    <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'>\n" +
                 "    <meta name='apple-mobile-web-app-capable' content='yes'>\n" +
-                "    <meta name='apple-mobile-web-app-title' content='" + G.config.project.gameName + "'>\n" +
-                "    <link rel='apple-touch-icon' href='../../build/imgs/qici.png'>\n" +
-                "    <link rel='apple-touch-startup-image' href='../../build/imgs/qici.png'>\n";
+                "    <meta name='apple-mobile-web-app-title' content='" + G.config.project.gameName + "'>\n";
+
+    if (publish) {
+        meta += "    <link rel='apple-touch-icon' href='http://engine.zuoyouxi.com/qici.png'>\n" +
+                "    <link rel='apple-touch-startup-image' href='http://engine.zuoyouxi.com/qici.png'>\n";
+    }
+    else {
+        meta += "    <link rel='apple-touch-icon' href='../../build/imgs/qici.png'>\n" +
+                "    <link rel='apple-touch-startup-image' href='../../build/imgs/qici.png'>\n";        
+    }
 
     content = content.replace(/__VIEWPORT__/g, meta);
 

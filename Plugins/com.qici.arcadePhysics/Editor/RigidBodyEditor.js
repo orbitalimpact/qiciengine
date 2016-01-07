@@ -38,13 +38,13 @@ G.extend.inspector('qc.arcade.RigidBody', function() {
     ]);
 
     gui.columnWidths = ['70+0.1', 20, '30+0.1', 20, '30+0.1'];
-    qc.editor.InspectorUtil.drawPoint(target, 'bounce');
-    qc.editor.InspectorUtil.drawPoint(target, 'velocity');
-    qc.editor.InspectorUtil.drawPoint(target, 'maxVelocity');
-    qc.editor.InspectorUtil.drawPoint(target, 'acceleration');
-    qc.editor.InspectorUtil.drawPoint(target, 'drag');
-    qc.editor.InspectorUtil.drawPoint(target, 'gravity');
-    qc.editor.InspectorUtil.drawPoint(target, 'friction');
+    qc.editor.InspectorUtil.drawPoint(target, 'bounce', 'bounce');
+    qc.editor.InspectorUtil.drawPoint(target, 'velocity', 'velocity');
+    qc.editor.InspectorUtil.drawPoint(target, 'maxVelocity', 'maxVelocity');
+    qc.editor.InspectorUtil.drawPoint(target, 'acceleration', 'acceleration');
+    qc.editor.InspectorUtil.drawPoint(target, 'drag', 'drag');
+    qc.editor.InspectorUtil.drawPoint(target, 'gravity', 'gravity');
+    qc.editor.InspectorUtil.drawPoint(target, 'friction', 'friction');
 
     gui.columnWidths = ['120+0.1', '30+3'];
     gui.line([

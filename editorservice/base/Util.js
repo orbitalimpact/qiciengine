@@ -91,3 +91,47 @@ module.exports.mixin = function (from, to) {
     }
     return to;
 };
+
+/**
+ * 获取本地ip地址
+ */
+var getLocalIP = module.exports.getLocalIP = function() {
+    var ifaces = require('os').networkInterfaces();
+
+    var localIP;
+    for (var key in ifaces) {
+        for (var i = 0; i < ifaces[key].length; i++) {
+            var iface = ifaces[key][i];
+
+            if (iface.family === 'IPv4' && iface.internal === false) {
+                localIP = iface.address;
+                break;
+            }
+        }
+        
+        if (localIP)
+            break;
+    }
+
+    localIP = localIP || 'localhost';
+
+    return localIP;
+};
+
+/**
+ * 判断socket连接是否来自于本机
+ */
+var isLocalSocket = module.exports.isLocalSocket = function(socket, localIP) {
+    var targetAddress;
+    if (socket && socket.handshake &&
+        (targetAddress = socket.handshake.address)) {
+        if (targetAddress.indexOf('::1') >= 0 ||
+            targetAddress.indexOf('127.0.0.1') >= 0 ||
+            targetAddress.indexOf(localIP) >= 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
+};

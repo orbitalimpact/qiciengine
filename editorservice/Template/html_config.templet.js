@@ -48,10 +48,12 @@
             // 入口场景
             entryScene : 'editor',
             loading: {
+                loadingText: 'Loading, please wait...',
                 loadingInterval: 200,
                 brightingInterval: 10,
                 blinkingCount: 5,
                 blinkingInterval: 70,
-                fadingInterval: 1
+                fadingInInterval: 50,
+                fadingOutInterval: 100
             }
         };

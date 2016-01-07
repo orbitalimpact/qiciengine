@@ -44,13 +44,11 @@ M.COMMAND.registerCmd({
         var opener = require('opener');
         opener('file:' + path.join(G.gameRoot, buildPath));
 
-        var targetAddress;
-        if (socket && socket.handshake &&
-            (targetAddress = socket.handshake.address)) {
+        var ret = M.util.isLocalSocket(socket, M.COMMUNICATE.host) ? true : false;
+        if (ret) {
             // 确定是本机，打开浏览器
-            if (targetAddress.indexOf('::1') >= 0 ||
-                targetAddress.indexOf('127.0.0.1') >= 0)
-                opener('http://localhost:' + M.COMMUNICATE.port + '/' + buildPath + '/StartGame.html');
+            var host = M.COMMUNICATE.host;
+            opener('http://' + host + ':' + M.COMMUNICATE.port + '/' + buildPath + '/StartGame.html');
         }
 
         return { 'operRet' : true };

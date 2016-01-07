@@ -16,7 +16,10 @@ M.COMMAND.registerCmd({
         fullPath = fsEx.expandPath(path.join(G.gameRoot, args.path));
         G.log.trace('open local dir : {0}', fullPath);
 
-        opener('file:' + fullPath);
-        return { 'operRet' : true };
+        var ret = M.util.isLocalSocket(socket, M.COMMUNICATE.host) ? true : false;
+        if (ret)
+            opener('file:' + fullPath);
+
+        return { 'operRet' : ret };
     }
 });

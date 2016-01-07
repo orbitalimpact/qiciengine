@@ -61,7 +61,9 @@ BannerAd.prototype.display = function() {
 
     // 创建一个iframe用于显示广告页面，并添加到新创建的div中
     frame = document.createElement('iframe');
-    frame.setAttribute('src', self.game.device.desktop ? self.urlPC : self.urlMobile);
+    var src = self.game.device.desktop ? self.urlPC : self.urlMobile;
+    src = src + '?valign=' + (self.location === BannerAd.AD_LOCATION_TOP ? 'top' : 'bottom');
+    frame.setAttribute('src', src);
     frame.setAttribute('width', '100%');
     frame.setAttribute('height', '100%');
     frame.setAttribute('frameborder', '0');

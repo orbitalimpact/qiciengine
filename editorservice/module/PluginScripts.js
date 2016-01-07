@@ -82,7 +82,12 @@ clazz.prototype.collectPlugins = function() {
                 (tmp.length > 0) && Array.prototype.push.apply(files, tmp);
             }
             else if (fsEx.extname(fullPath) === '.js') {
-                if (except.indexOf(fullPath) < 0)
+                var len = except.length;
+                var isException = false;
+                while (len-- && !isException) {
+                    isException = fullPath.indexOf(except) === 0;
+                }
+                if (!isException)
                     files.push(fullPath);
             }
         });
@@ -133,6 +138,7 @@ clazz.prototype.collectPlugins = function() {
                 plugin.editorRoot = path.join(dir, plugin.editorRoot || "Editor" );
                 plugin.scriptRoot = path.join(dir, plugin.scriptRoot || "Script");
                 plugin.assetRoot = path.join(dir, plugin.assetRoot || "Assets");
+                plugin.serviceRoot = path.join(dir, plugin.serviceRoot || "Editor/Service");
 
                 plugin.editorFiles = plugin.editorFiles || [];
                 plugin.scriptFiles = plugin.scriptFiles || [];
@@ -146,7 +152,7 @@ clazz.prototype.collectPlugins = function() {
                 // 对当前脚本依赖整理个依赖排序
                 scriptDependence = topo.toposort(plugin.scriptDependence);
 
-                var col = collectJS(plugin.editorRoot, plugin.editorFiles);
+                var col = collectJS(plugin.editorRoot, plugin.editorFiles.concat(plugin.serviceRoot));
                 col.length > 0 && Array.prototype.push.apply(plugin.editorFiles,
                     sortByDependece(col, plugin.editorRoot, scriptDependence));
 
@@ -286,7 +292,9 @@ clazz.prototype.saveEffectivePlugins = function(effective) {
     M.PROJECT.genGameHTML();
 
     G.emitter.emit('refreshStartupFile');
+    G.emitter.emit('effectivePluginsChanged');
     self.refreshVirtualPath();
+    return true;
 };
 
 /**

@@ -149,6 +149,17 @@ clazz.prototype.publishTo = function(dstDir) {
 
     if (!G.gameRoot) return '无效工程。';
 
+    var publishContent = fs.readFileSync(G.editorRoot + 'Template/Publish.templet.html', 'utf8');
+    var appCacheContent = fs.readFileSync(G.editorRoot + 'Template/ApplicationCache.templet.appcache', 'utf8');
+    var publishParams = {
+        gameRoot: G.gameRoot,
+        outPath: dstDir,
+        config: G.config.project,
+        startGameTemplate: publishContent,
+        appCacheTemplate: appCacheContent
+    };
+    G.emitter.emit('BeforePublish', publishParams);
+
     if (!G.config.scene.scene || !Object.keys(G.config.scene.scene).length)
         return '场景列表为空，无法发布游戏，请通过菜单工程-设置进行编辑。';
 
@@ -190,7 +201,8 @@ clazz.prototype.publishTo = function(dstDir) {
 
     // 2. 根据 Publish.templet.html 生成 StartGame.html
     // 读取模板文件
-    var content = fs.readFileSync(G.editorRoot + 'Template/Publish.templet.html', 'utf8');
+    // var content = fs.readFileSync(G.editorRoot + 'Template/Publish.templet.html', 'utf8');
+    var content = publishParams.startGameTemplate;
 
     // 替换脚本文件
     content = content.replace(/__PUBLISH_USER_SCRIPTS__/g, miniJSPath);
@@ -198,14 +210,19 @@ clazz.prototype.publishTo = function(dstDir) {
     // 替换插件文件
     content = M.PLUGIN_SCRIPTS.genTemplateContent(content, true);
 
+    // 加入用户脚本
+    content = M.USER_SCRIPTS.genTemplateContent(content, true);
+
     // 写入目标文件
-    fs.writeFileSync(path.join(dstDir, 'StartGame.html'),
-        M.USER_SCRIPTS.genTemplateContent(content, true));
+    fs.writeFileSync(path.join(dstDir, 'StartGame.html'), content);
+
+    publishParams.startGameContent = content;
 
     // 3、判断是否生成 applicate cache 文件
     if (G.config.project.appCache)
     {
-        content = fs.readFileSync(G.editorRoot + 'Template/ApplicationCache.templet.appcache', 'utf8');
+        // content = fs.readFileSync(G.editorRoot + 'Template/ApplicationCache.templet.appcache', 'utf8');
+        content = publishParams.appCacheTemplate;
         content = content.replace(/__CACHE_VERSION__/g, M.util.formattedTime());
         content = content.replace(/{__ver__}/g, G.VERSION);
         content = content.replace(/__EXTERNAL_PLUGINS_SCRIPTS__/g,
@@ -213,6 +230,7 @@ clazz.prototype.publishTo = function(dstDir) {
         content = content.replace(/__PUBLISH_USER_SCRIPTS__/g, miniJSPath);
         content = M.USER_SCRIPTS.genCacheAssetsContent(content, true);
         fs.writeFileSync(path.join(dstDir, 'qici.appcache'), content);
+        publishParams.appCacheContent = content;
     }
 
     // 4. 复制所有的 bin/ttf 到 Build 下
@@ -254,6 +272,7 @@ clazz.prototype.publishTo = function(dstDir) {
         explorePath(pluginAssets[len], path.join(dstDir, 'Plugins', relativePath));
     }
 
+    G.emitter.emit('AfterPublish', publishParams);
     return true;
 };
 
@@ -269,7 +288,50 @@ clazz.prototype.getRecentOpen = function() {
     }
     if (!conf) return [];
     if (!conf.recentOpen) return [];
-    return conf.recentOpen;
+
+    // 有信息，需逐个验证是否有效工程
+    var recentOpen = conf.recentOpen;
+    var i, len, p, valid;
+    var modified;
+
+    len = recentOpen.length;
+
+    for (i = 0; i < len; i++) {
+        p = recentOpen[i];
+        valid = false;
+
+        do
+        {
+            if (!p) break;
+            try {
+                if (!fs.existsSync(p) ||
+                    !fs.statSync(p).isDirectory())
+                    break;
+
+                // 检查是否有 ProjectSetting/project.setting
+                if (!fs.existsSync(path.join(p, 'ProjectSetting')) ||
+                    !fs.existsSync(path.join(p, 'ProjectSetting/project.setting')))
+                    break;
+
+                valid = true;
+            }
+            catch (e) {}
+        } while (false);
+
+        if (!valid) {
+            // 发现一个非法路径
+            modified = true;
+            recentOpen[i] = false;
+        }
+    }
+
+    if (!modified) return recentOpen;
+
+    // 整理后写入保存
+    var ret = [];
+    for (i = 0; i < len; i++) if (recentOpen[i]) ret.push(recentOpen[i]);
+    M.PROJECT.setRecentOpen(ret);
+    return ret;
 };
 
 // 设置最近打开的工程列表
@@ -355,6 +417,12 @@ clazz.prototype.prepareGenGameHTML = function() {
         self.genGameHTML();
     }, 100);
 };
+
+// 保存项目配置
+clazz.prototype.saveProjectSetting = function() {
+    var f = G.load('filesystem/AutoConfigProject');
+    f.writeProjectSetting(G.config.project);
+}
 
 // 定义模块
 G.defineModule('PROJECT', clazz);

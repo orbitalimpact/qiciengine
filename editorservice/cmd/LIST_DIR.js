@@ -36,7 +36,14 @@ var listDir = function(dir) {
         list = [];
         if (process.platform !== 'win32' && dir[0] !== '/') dir = '/' + dir;
         if (process.platform === 'win32' && dir[dir.length - 1] !== '/') dir = dir + '/';
-        fs.readdirSync(dir).forEach(function(fileName) {
+        var subFiles;
+        try {
+            subFiles = fs.readdirSync(dir);
+        }
+        catch (e) {
+            return 'invalid directory';
+        }
+        subFiles.forEach(function(fileName) {
             if (fsEx.isHidden(dir, fileName))
                 return;
             if (fsEx.skipWhenExplore(dir, fileName))

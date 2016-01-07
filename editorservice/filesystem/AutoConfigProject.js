@@ -49,7 +49,7 @@ G.emitter.on('serviceOn', function() {
     }
     else {
         var opener = require('opener');
-        opener('http://localhost:' + M.COMMUNICATE.port + '/Project.html');
+        opener('http://' + M.COMMUNICATE.host + ':' + M.COMMUNICATE.port + '/Project.html');
 
         // 等待 3 秒连接进入
         setTimeout(function() {
@@ -158,6 +158,7 @@ var initConfig = function() {
         fsEx.toUnixFileName(gameRoot + 'Scripts/'),
         fsEx.toUnixFileName(tempPath),
         fsEx.toUnixFileName(gameRoot + 'Editor/'),
+        fsEx.toUnixFileName(gameRoot + 'Editor/Service/'),
         fsEx.toUnixFileName(gameRoot + 'Build/'),
         fsEx.toUnixFileName(gameRoot + 'Plugins/')
     ];

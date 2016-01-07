@@ -42,7 +42,6 @@ clazz.prototype.queryLatestVersion = function(context) {
     context = context || this;
     var body = '';
     var delayQuery = function(context, e) {
-        console.log('delay');
         setTimeout(context.queryLatestVersion, 20000, context);
     };
     http.get(versionCheckURL, function(res) {
