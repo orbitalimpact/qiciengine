@@ -226,13 +226,6 @@ explorPath = module.exports.explorePath = function(dir) {
                     assetType : assetType,
                     source : source
                 };
-
-                // JS 的话还需要一个信息：脚本之间的依赖关系
-                if (assetType === G.ASSET_TYPE.ASSET_JS) {
-                    var deps = G.gameFiles.scriptDependence[uuid];
-                    if (deps)
-                        dict[subPath].dependences = deps;
-                }
             }
         }
     });
@@ -283,13 +276,6 @@ explorPath = module.exports.explorePath = function(dir) {
                     assetType : assetType,
                     source : source
                 };
-
-                // JS 的话还需要一个信息：脚本之间的依赖关系
-                if (assetType === G.ASSET_TYPE.ASSET_JS) {
-                    var deps = G.gameFiles.scriptDependence[uuid];
-                    if (deps)
-                        dict[subPath].dependences = deps;
-                }
             }
         }
     });

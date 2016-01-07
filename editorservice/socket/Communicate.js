@@ -29,7 +29,7 @@ clazz.prototype.listen = function(port) {
 
             if (url && /\.(mp3|ogg|mp3\.bin|ogg\.bin)$/.test(url.toLowerCase()))
             // 音乐文件
-                return false;            
+                return false;
 
             // 其他，全体默认压缩
             return true;
@@ -57,6 +57,24 @@ clazz.prototype.listen = function(port) {
     if (G.gameRoot) {
         this.switchStatic();
     }
+
+    // 监听 remoteLog 远程日志的 post 请求
+    var router = express.Router();
+    app.use('/remoteLog', router);
+
+    // body parse 中间件
+    var bodyParser = require('body-parser');
+    router.use(bodyParser.urlencoded({ extended: false }));
+    router.use(bodyParser.json());
+    router.use(bodyParser.text({ type : function(){ return true; }}));
+
+    // 客户端请求 post http://localhost:5002/remoteLog
+    router.post('/', function(req, res) {
+        var body = req.body;
+        console.log('remoteLog' , body)
+        res.send("200 OK");
+        res.end();
+    });
 
     // 监听端口重复事件以进行重试
     http.on('error', function (e) {

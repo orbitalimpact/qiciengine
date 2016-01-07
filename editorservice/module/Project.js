@@ -202,7 +202,20 @@ clazz.prototype.publishTo = function(dstDir) {
     fs.writeFileSync(path.join(dstDir, 'StartGame.html'),
         M.USER_SCRIPTS.genTemplateContent(content, true));
 
-    // 3. 复制所有的 bin/ttf 到 Build 下
+    // 3、判断是否生成 applicate cache 文件
+    if (G.config.project.appCache)
+    {
+        content = fs.readFileSync(G.editorRoot + 'Template/ApplicationCache.templet.appcache', 'utf8');
+        content = content.replace(/__CACHE_VERSION__/g, M.util.formattedTime());
+        content = content.replace(/{__ver__}/g, G.VERSION);
+        content = content.replace(/__EXTERNAL_PLUGINS_SCRIPTS__/g,
+                                  M.PLUGIN_SCRIPTS.printCacheExternalDependenceScripts(true));
+        content = content.replace(/__PUBLISH_USER_SCRIPTS__/g, miniJSPath);
+        content = M.USER_SCRIPTS.genCacheAssetsContent(content, true);
+        fs.writeFileSync(path.join(dstDir, 'qici.appcache'), content);
+    }
+
+    // 4. 复制所有的 bin/ttf 到 Build 下
 
     // 遍历 Game/Assets 文件夹
     var explorePath = function(dir, targetDir) {
@@ -249,7 +262,7 @@ clazz.prototype.getRecentOpen = function() {
     // 获取配置信息
     var conf;
     try {
-        conf = fs.readJsonSync(path.join(G.editorRoot, 'project.setting'), { throws : false });    
+        conf = fs.readJsonSync(path.join(G.editorRoot, 'project.setting'), { throws : false });
     }
     catch(e) {
         conf = null;
@@ -264,12 +277,12 @@ clazz.prototype.setRecentOpen = function(recentOpen) {
     // 获取配置信息
     var conf;
     try {
-        conf = fs.readJsonSync(path.join(G.editorRoot, 'project.setting'), { throws : false });    
+        conf = fs.readJsonSync(path.join(G.editorRoot, 'project.setting'), { throws : false });
     }
     catch (e) {
         conf = null;
     }
-    
+
     if (!conf) conf = {};
     conf.recentOpen = recentOpen;
     G.load('filesystem/FsExpand').writeJsonSync(path.join(G.editorRoot, 'project.setting'), conf);
@@ -280,7 +293,7 @@ clazz.prototype.recordRecentOpen = function(dir) {
     // 获取 project 设置
     var conf;
     try {
-        conf = fs.readJsonSync(path.join(G.editorRoot, 'project.setting'), { throws : false });    
+        conf = fs.readJsonSync(path.join(G.editorRoot, 'project.setting'), { throws : false });
     }
     catch (e) {
         conf = null;

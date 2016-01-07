@@ -330,6 +330,10 @@ TableView.prototype.onDestroy = function() {
  * 更新
  */
 TableView.prototype.update = function() {
+    if (this.content) {
+        this.scrollSupport.pivotX = this.content.pivotX;
+        this.scrollSupport.pivotY = this.content.pivotY;
+    }
     this.scrollSupport.update(this.game.time.deltaTime);
     if (this._needRebuild) {
         this._rebuildTable();

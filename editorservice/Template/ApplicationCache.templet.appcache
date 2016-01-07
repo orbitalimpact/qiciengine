@@ -1,0 +1,15 @@
+CACHE MANIFEST
+#VERSION __CACHE_VERSION__
+Assets/meta/globalUrlMap.js
+Assets/css/style.css
+http://engine.zuoyouxi.com/lib/{__ver__}/phaser.min.js
+http://engine.zuoyouxi.com/lib/{__ver__}/webfontloader.js
+http://engine.zuoyouxi.com/lib/{__ver__}/qc-core.js
+http://engine.zuoyouxi.com/lib/{__ver__}/qc-loading.js
+http://engine.zuoyouxi.com/lib/qc-webgl.js
+__EXTERNAL_PLUGINS_SCRIPTS__
+__PUBLISH_USER_SCRIPTS__
+__PUBLISH_ASSETS__
+
+NETWORK:
+*

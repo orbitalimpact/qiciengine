@@ -13,8 +13,13 @@ G.extend.inspector('qc.Plugins.BannerAd', function() {
     gui.columnWidths = ['70+0.1', '60+1'];
 
     gui.line([
-        gui.text('Url'),
-        gui.stringInput({ bind: 'url' })
+        gui.text('UrlPC'),
+        gui.stringInput({ bind: 'urlPC' })
+    ]);
+
+    gui.line([
+        gui.text('UrlMobile'),
+        gui.stringInput({ bind: 'urlMobile' })
     ]);
 
     gui.line([

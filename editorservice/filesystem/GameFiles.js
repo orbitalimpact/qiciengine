@@ -27,11 +27,6 @@ var clazz = function() {
      */
     this._tempUUID2file = {
     };
-
-    /**
-     * 脚本的依赖关系，使用uuid来记录
-     */
-    this.scriptDependence = {};
 };
 clazz.prototype = {};
 clazz.prototype.constructor = clazz;

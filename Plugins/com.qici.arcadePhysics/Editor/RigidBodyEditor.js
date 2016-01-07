@@ -92,6 +92,6 @@ G.extend.inspector('qc.arcade.RigidBody', function() {
         gui.text('ccdIterations'),
         gui.intInput({ bind: 'ccdIterations' })
     ]);
-    qc.editor.InspectorUtil.drawNodes(self, 'collides');
-    qc.editor.InspectorUtil.drawNodes(self, 'overlaps');
+    qc.editor.InspectorUtil.drawNodes(self, 'Collides', 'collides');
+    qc.editor.InspectorUtil.drawNodes(self, 'Overlaps', 'overlaps');
 });

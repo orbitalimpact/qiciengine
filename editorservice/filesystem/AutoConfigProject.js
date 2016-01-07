@@ -194,7 +194,8 @@ var initConfig = function() {
         antialias: true,
         renderer: 'Auto',
         transparent: false,
-        developerMode: false
+        developerMode: false,
+        appCache: true,
     };
     var projectFile = settingPath + 'project.setting';
     if (!fs.existsSync(projectFile)) {

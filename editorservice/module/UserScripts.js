@@ -16,83 +16,40 @@ clazz.prototype = {};
 clazz.prototype.constructor = clazz;
 
 /**
- * 获取一个脚本依赖(uuid)
+ * 获取某个目录下的脚本载入次序信息
  */
-clazz.prototype.getDependence = function(script) {
-    return G.gameFiles.scriptDependence[script] || [];
+clazz.prototype.getScriptOrder = function(dir) {
+    if (dir === 'Scripts') return G.gameFiles.logicalScriptOrder || [];
+    if (dir === 'Editor') return G.gameFiles.editorScriptOrder || [];
+    return [];
 };
 
 /**
- * 添加一个脚本依赖(uuid)
+ * 设置脚本依赖顺序
  */
-clazz.prototype.addDependence = function(script, dependence) {
-    // 检查闭环依赖，如果存在则不允许加入
-    var dependences = G.gameFiles.scriptDependence;
-    if (!topo.canAddEdge(dependences, script, dependence))
-        // 不允许增加这条依赖
-        return '依赖关系出现环状，无法添加该依赖。';
+clazz.prototype.setScriptOrder = function(dir, order) {
+    if (!order) order = [];
 
-    if (script === G.gameFiles.entryScript)
-        // 不能添加入口文件的依赖
-        return '入口文件不能依赖其他脚本。';
+    G.log.trace('Set script order, path : {0}, order : {1}', dir, order);
 
-    if (!dependences[script]) {
-        dependences[script] = [dependence];
+    if (dir === 'Scripts') {
+        G.gameFiles.logicalScriptOrder = order;
+        this.save();
+
+        // 重新生成游戏启动文件
+        G.log.debug('save logical script setting, generate html.');
+        M.PROJECT.genGameHTML();
     }
-    else {
-        var index = dependences[script].indexOf(dependence);
-        if (index >= 0) return;
+    else if (dir === 'Editor') {
+        G.gameFiles.editorScriptOrder = order;
+        this.save();
 
-        dependences[script].push(dependence);
+        // 重新生成游戏启动文件
+        G.log.debug('save editor script setting, generate html.');
+        G.emitter.emit('refreshStartupFile');
     }
-
-    // 立刻序列化下
-    this.save();
-
-    return true;
-};
-
-/**
- * 移除一个脚本依赖(uuid)
- */
-clazz.prototype.removeDependence = function(script, dependence) {
-    var arr = G.gameFiles.scriptDependence[script];
-    if (!arr) return false;
-
-    var index = arr.indexOf(dependence);
-    if (index < 0) return false;
-
-    // 删除元素
-    arr.splice(index, 1);
-    if (arr.length === 0)
-        delete G.gameFiles.scriptDependence[script];
-
-    // 立刻序列化下
-    this.save();
-    return true;
-};
-
-/**
- * 设置一个脚本作为入口
- */
-clazz.prototype.setAsEntry = function(script) {
-    var arr = G.gameFiles.scriptDependence[script];
-    if (arr && arr.length)
-        return 'Current script relys on other, it can not be used as the entrance.';
-
-    // 设置并立即序列化
-    G.gameFiles.entryScript = script;
-    this.save();
-
-    return true;
-};
-
-/**
- * 当前脚本是否入口
- */
-clazz.prototype.isEntry = function(script) {
-    // 设置并立即序列化
-    return G.gameFiles.entryScript === script;
+    else
+        return;
 };
 
 /**
@@ -102,60 +59,29 @@ clazz.prototype.getScripts = function(dir) {
     // 收集所有的脚本文件
     var uuid2file = G.gameFiles.uuid2file;
 
+    var order = M.USER_SCRIPTS.getScriptOrder(dir);
+
     var scriptFile = {};
-    var count = 0;
+    var weight, orderLen = order.length;
+
     for (var uuid in uuid2file) {
         var path = uuid2file[uuid];
         if (path.indexOf(dir) == 0) {
-            count++;
-            scriptFile[uuid] = path;
+            for (weight = 0; weight < orderLen; weight++)
+                if (path.indexOf(order[weight]) === 0)
+                    break;
+
+            scriptFile[path] = weight;
         }
     }
 
-    // 返回信息
-    var ret = new Array(count);
+    // 根据权重排序
+    var arr = Object.keys(scriptFile);
+    arr.sort(function(key1, key2) {
+        return scriptFile[key1] - scriptFile[key2];
+    });
 
-    // 获取拓扑列表（ [a, b, c] 表示 c 是 0 依赖）
-    var topoOrder = topo.toposort(G.gameFiles.scriptDependence);
-    var entryPath;
-    if (G.gameFiles.entryScript)
-        entryPath = scriptFile[G.gameFiles.entryScript];
-
-    // 从第一个开始搞，将依赖最多的逐渐加入队列尾部中
-    var cursor = 0;
-    var length = topoOrder.length;
-    while (cursor < length) {
-        var uuid = topoOrder[cursor++];
-        var path = scriptFile[uuid];
-        if (path) {
-            // 相对设置为 0 会比删除快一些
-            scriptFile[uuid] = 0;
-            // 入队列尾部
-            ret[--count] = path;
-        }
-    }
-
-    // 剩下的全部是 0  依赖的元素
-    for (var uuid in scriptFile) {
-        var path = scriptFile[uuid];
-        if (path) {
-            ret[--count] = path;
-            if (count <= 0)
-                break;
-        }
-    }
-
-    // entry file 无条件在第一个
-    if (entryPath) {
-        var pos = ret.indexOf(entryPath);
-        if (pos > 0) {
-            ret.splice(pos, 1);
-            ret.unshift(entryPath);
-        }
-    }
-
-    // 返回
-    return ret;
+    return arr;
 };
 
 /**
@@ -254,7 +180,13 @@ clazz.prototype.genTemplateContent = function(content, publish) {
     var urlMapPath;
 
     if (publish)
+    {
         urlMapPath = './Assets/meta/globalUrlMap.js';
+        if (G.config.project.appCache)
+            content = content.replace(/__MANIFEST__/g, 'manifest="qici.appcache"');
+        else
+            content = content.replace(/__MANIFEST__/g, '');
+    }
     else
         urlMapPath = M.USER_SCRIPTS.addJsExtToDenyCache('./Assets/meta/globalUrlMap.js', true);
 
@@ -300,7 +232,7 @@ clazz.prototype.genTemplateContent = function(content, publish) {
     var meta = "    <meta name='viewport' content='width=device-width,user-scalable=no'>\n" +
                 "    <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'>\n" +
                 "    <meta name='apple-mobile-web-app-capable' content='yes'>\n" +
-                "    <meta name='apple-mobile-web-app-title' content='QICI Engine'>\n" +
+                "    <meta name='apple-mobile-web-app-title' content='" + G.config.project.gameName + "'>\n" +
                 "    <link rel='apple-touch-icon' href='../../build/imgs/qici.png'>\n" +
                 "    <link rel='apple-touch-startup-image' href='../../build/imgs/qici.png'>\n";
 
@@ -319,17 +251,82 @@ clazz.prototype.genTemplateContent = function(content, publish) {
 };
 
 /**
+ * application cache 的 __PUBLISH_ASSETS__ 替换
+ */
+clazz.prototype.genCacheAssetsContent = function(content, publish) {
+    if (publish)
+    {
+        // 发布，则读 entryScene 对应的 state 文件，取得依赖的资源文件名
+        var entryScene = G.config.scene.entryScene;
+        var scenePath = G.config.scene.scene[entryScene];
+
+        var urlList = [ scenePath ];
+        var visited = {};
+
+        var findPrefab = function(prefabUrl, type) {
+            // 已经访问过的资源
+            if (visited[prefabUrl]) return;
+            visited[prefabUrl] = true;
+
+            fullPath = fsEx.expandPath(path.join(G.gameRoot, prefabUrl));
+            fullPath = fullPath.replace('.bin', type);
+            var prefab = fs.readJSONFileSync(fullPath);
+            for (var key in prefab.dependences)
+            {
+                if (key != "__builtin_resource__")
+                {
+                    var url = G.gameFiles.uuid2file[key];
+                    if (url && urlList.indexOf(url) === -1)
+                    {
+                        if(/\.(mp3|ogg|mp3\.bin|ogg\.bin)$/.test(url.toLowerCase()))
+                            M.USER_SCRIPTS.addSoundCache(url, urlList);
+                        else
+                            urlList.push(url);
+                    }
+
+                    if (url.indexOf('prefab') !== -1)
+                        // 预制资源还需要取得其依赖的资源
+                        findPrefab(url, '.prefab');
+                }
+            }
+        };
+
+        findPrefab(scenePath, '.state');
+        if (urlList.length > 0)
+        {
+            var str = urlList.join('\n');
+            content = content.replace(/__PUBLISH_ASSETS__/g, str);
+        }
+    }
+
+    return content;
+}
+
+// sound 文件需要将各个类型都加入 cache 中
+clazz.prototype.addSoundCache = function(url, urlList) {
+    var prefix = url.match(/(.*)\.(mp3|ogg)/)[1];
+    url = prefix + '.mp3';
+    if (urlList.indexOf(url) === -1)
+        urlList.push(url);
+    url = prefix + '.mp3.bin';
+    if (urlList.indexOf(url) === -1)
+        urlList.push(url);
+    url = prefix + '.ogg';
+    if (urlList.indexOf(url) === -1)
+        urlList.push(url);
+    url = prefix + '.ogg.bin';
+    if (urlList.indexOf(url) === -1)
+        urlList.push(url);
+}
+
+/**
  * 序列化
  */
 clazz.prototype.save = function() {
     fs.writeJSONFileSync(G.gameRoot + 'ProjectSetting/script.setting', {
-        dependence : G.gameFiles.scriptDependence,
-        entry : G.gameFiles.entryScript
+        logicalScriptOrder : G.gameFiles.logicalScriptOrder,
+        editorScriptOrder : G.gameFiles.editorScriptOrder
     });
-
-    // 重新生成游戏启动文件
-    G.log.debug('save script setting, generate html.');
-    M.PROJECT.genGameHTML();
 };
 
 /**
@@ -337,8 +334,19 @@ clazz.prototype.save = function() {
  */
 clazz.prototype.restore = function() {
     var jsonData = fs.readJSONFileSync(G.gameRoot + 'ProjectSetting/script.setting') || {};
-    G.gameFiles.scriptDependence = jsonData.dependence || {};
-    G.gameFiles.entryScript = jsonData.entry;
+    G.gameFiles.logicalScriptOrder = jsonData.logicalScriptOrder || [];
+    G.gameFiles.editorScriptOrder = jsonData.editorScriptOrder || []
+};
+
+/**
+ * 确保 unix 风格
+ */
+clazz.prototype.toUnixPath = function(key) {
+    key = key.replace(/\\/g, '/');
+    var double = /\/\//;
+    while (key.match(double))
+        key = key.replace(double, '/');
+    return key;
 };
 
 var jsExtMap = {};
@@ -348,10 +356,7 @@ var jsExtMap = {};
  */
 clazz.prototype.addJsExtToDenyCache = function(key, forceRefresh) {
     var rawKey = key;
-    key = key.replace(/\\/g, '/');
-    var double = /\/\//;
-    while (key.match(double))
-        key = key.replace(double, '/');
+    key = M.USER_SCRIPTS.toUnixPath(key);
 
     var extInfo = jsExtMap[key];
     if (extInfo && extInfo.ext && !forceRefresh)

@@ -470,13 +470,45 @@ clazz.prototype.printExternalDependenceScripts = function(publish) {
                 content += "\t\t\t[" + "'" + s + "', '" + i + "'],\n";
             }
             else {
-                s = M.USER_SCRIPTS.addJsExtToDenyCache(s);
-                content = "\t\t\t[" + "'../" + s.replace(/\\/g,'/') + "', '" + i + "'],\n" + content;
+                if (!publish) {
+                    s = M.USER_SCRIPTS.addJsExtToDenyCache(s);
+                    content = "\t\t\t[" + "'../" + s.replace(/\\/g,'/') + "', '" + i + "'],\n" + content;
+                }
+                else {
+                    content = "\t\t\t[" + s.replace(/\\/g,'/') + "', '" + i + "'],\n" + content;
+                }
             }
         }
     }
     return content;
 };
+
+/**
+ * 打印缓存的外部引用脚本
+ * @param publish
+ * @returns {string}
+ */
+clazz.prototype.printCacheExternalDependenceScripts = function(publish) {
+    var self = this;
+    var scripts = self.externalDependencies;
+    var content = '';
+    for (var i in scripts) {
+        var pluginScripts = scripts[i];
+        var len = pluginScripts.length;
+        while (len-- > 0) {
+            var s = pluginScripts[len];
+            // 外部引用脚本不需要添加随机字符串
+            if (s.indexOf("://") > 0) {
+                content += s + "\n";
+            }
+            else {
+                content = s.replace(/\\/g,'/') + "\n" + content;
+            }
+        }
+    }
+    return content;
+};
+
 
 /**
  * 打印编辑器扩展脚本

@@ -1,8 +1,9 @@
 {
-  "name": "widget",
+  "name": "qiciengine",
   "version": "1.0.0",
-  "description": "QC Engine Widget",
+  "description": "QICI Engine",
   "devDependencies": {
+    "body-parser": "^1.14.1",
     "buildify": "^0.4.0",
     "chalk": "^1.0.0",
     "chokidar": "^1.0.5",

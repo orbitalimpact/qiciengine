@@ -107,6 +107,9 @@ var ScrollSupport = com.qici.extraUI.ScrollSupport = function(game, node, fnView
      */
     this._isDragging = false;
 
+    this.pivotX = 0;
+    this.pivotY = 0;
+
     // 监听滚动事件和拖拽事件
     if (this.node) {
 	    this.node.onWheel.add(this._doWheel, this);
@@ -501,11 +504,11 @@ ScrollSupport.prototype._updateBounds = function() {
     var diffHeight = viewRect.height - this._contentRect.height;
     if (diffWidth > 0) {
         this._contentRect.width = viewRect.width;
-        this._contentRect.x -= diffWidth;
+        this._contentRect.x -= diffWidth * this.pivotX;
     }
     if (diffHeight > 0) {
         this._contentRect.height = viewRect.height;
-        this._contentRect.y -= diffHeight;
+        this._contentRect.y -= diffHeight * this.pivotY;
     }
 };
 
