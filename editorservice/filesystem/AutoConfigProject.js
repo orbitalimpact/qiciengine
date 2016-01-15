@@ -55,7 +55,7 @@ G.emitter.on('serviceOn', function() {
         setTimeout(function() {
             if (G.beConnnected) return;
             var chalk = require('chalk');
-            G.log.trace(chalk.red('Please enter this url in browser:\n=====\nhttp://127.0.0.1:{0}/Project.html\n====='),
+            G.log.trace(chalk.red('Please enter this url in browser:\n=====\nhttp://localhost:{0}/Project.html\n====='),
                 M.COMMUNICATE.port);
         }, 3 * 1000);
     }

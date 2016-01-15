@@ -4,4 +4,4 @@
 * editorservice 的版本号
 */
 
-G.VERSION = '1.0.5';
+G.VERSION = '1.0.6';

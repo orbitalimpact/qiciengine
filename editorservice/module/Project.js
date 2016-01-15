@@ -147,7 +147,7 @@ clazz.prototype.publishTo = function(dstDir) {
     var buildify = require('buildify');
     var fsEx = G.load('filesystem/FsExpand');
 
-    if (!G.gameRoot) return '无效工程。';
+    if (!G.gameRoot) return 'Invalid project';
 
     var publishContent = fs.readFileSync(G.editorRoot + 'Template/Publish.templet.html', 'utf8');
     var appCacheContent = fs.readFileSync(G.editorRoot + 'Template/ApplicationCache.templet.appcache', 'utf8');
@@ -161,7 +161,7 @@ clazz.prototype.publishTo = function(dstDir) {
     G.emitter.emit('BeforePublish', publishParams);
 
     if (!G.config.scene.scene || !Object.keys(G.config.scene.scene).length)
-        return '场景列表为空，无法发布游戏，请通过菜单工程-设置进行编辑。';
+        return 'Scene list is empty, please edit setting by menu Project/Settings';
 
     // G.log.trace('强行刷新下uuid2file。');
     G.gameFiles.refresh();
@@ -175,7 +175,7 @@ clazz.prototype.publishTo = function(dstDir) {
 
     // 校验 ver
     if (!ver || (!/^\d[\d\.]*\d$/.test(ver) && !/^\d$/.test(ver)))
-        return '版本号信息有误，期望[0-9]跟.组成，请在菜单设置中设置版本号。';
+        return 'Invalid version, please edit setting by menu Project/Settings';
 
     // 1. 写入所有user scripts到一个文件中
     var debugJSPath = 'js/game-scripts-debug-' + ver + '-' + G.uuid() + '.js';

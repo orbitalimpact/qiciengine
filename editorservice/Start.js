@@ -100,7 +100,32 @@ if (process.argv.indexOf('--repl') > 0) {
         repl.start({
             prompt: chalk.green('QCNode> '),
             input: process.stdin,
-            output: process.stdout
+            output: process.stdout,
+            eval : function(cmd, context, fileName, callback) {
+                var match;
+                if (cmd.trim() === 'o') {
+                    var opener = require('opener');
+                    opener('http://' + M.COMMUNICATE.host + ':' + M.COMMUNICATE.port + '/Project.html');
+                    callback(null, 'OK');
+                }
+                else if (match = cmd.match(/^use (.*)/)) {
+                    // 切换 client
+                    switchCurrClient(match[1].trim());
+                    callback(null, 'OK');
+                }
+                else {
+                    match = cmd.match(/^p(\d*) (.+)/);
+                    if (match)
+                    {
+                        if (match[1] === '')
+                            queueClientCmd(match[2]);
+                        else
+                            queueClientCmd(match[2], match[1].trim());
+                    }
+                    else
+                        callback(null, eval(cmd));
+                }
+            },
         });
     });
 }

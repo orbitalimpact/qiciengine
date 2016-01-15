@@ -79,7 +79,7 @@ clazz.prototype.listen = function(port) {
         }
         else
         {
-            console.log('remoteLog' , body);
+            console.log(body);
             res.send("200 OK");
             res.end();
         }
@@ -88,7 +88,7 @@ clazz.prototype.listen = function(port) {
     // 监听端口重复事件以进行重试
     http.on('error', function (e) {
         if (e.code == 'EADDRINUSE') {
-            G.log.important('端口{0}被占用，准备尝试端口{1}...', port, port + 1);
+            G.log.important('Port {0} is occupied, try another port {1}...', port, port + 1);
             port = port + 1;
             setTimeout(function () {
                 http.close();

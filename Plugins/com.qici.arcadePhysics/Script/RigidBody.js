@@ -542,7 +542,7 @@ RigidBody.prototype.angleBetween = function(target) {
  * @private
  */
 RigidBody.prototype._collideCallback = function(o1, o2) {
-    this.gameObject._sendMessage('onCollide', o1._qc, o2._qc);
+    this.gameObject._sendMessage('onCollide', false, o1._qc, o2._qc);
 };
 
 /**
@@ -550,5 +550,5 @@ RigidBody.prototype._collideCallback = function(o1, o2) {
  * @private
  */
 RigidBody.prototype._overlapCallback = function(o1, o2) {
-    this.gameObject._sendMessage('onOverlap', o1._qc, o2._qc);
+    this.gameObject._sendMessage('onOverlap', false, o1._qc, o2._qc);
 };

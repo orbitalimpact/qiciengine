@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 __VIEWPORT__
     <link rel="shortcut icon" href="../../lib/imgs/qici.ico" />
-    <title>Preview Game WebGL</title>
+    <title>Preview WebGL</title>
     <style>
         html, body {
             padding: 0;
@@ -21,7 +21,8 @@ __VIEWPORT__
         qici.config.renderer = 'WebGL';
         qici.config.developerMode = true;
         qici.config.preview = true;
-
+		qici.config.remoteLogUrl = window.location.origin;
+		
         __initResizableGameSize__
 
         __PLUGIN_VARIABLES__
